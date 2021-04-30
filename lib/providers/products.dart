@@ -39,6 +39,10 @@ class Products with ChangeNotifier {
     //       'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     // ),
   ];
+  final String token;
+  final String userId;
+
+  Products(this.token, this.userId, this._items);
 
   List<Product> get items {
     return [..._items];
@@ -53,15 +57,20 @@ class Products with ChangeNotifier {
   }
 
   Future<void> fetchAndSetProducts() async {
-    final url = Uri.https(
-        'flutter-shop-app-9b43f-default-rtdb.europe-west1.firebasedatabase.app',
-        '/products.json');
+    final url = Uri.parse(
+      'https://flutter-shop-app-9b43f-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$token',
+    );
     try {
       final response = await http.get(url);
       final extractedData = json.decode(response.body) as Map<String, dynamic>;
       if (extractedData == null) {
         return;
       }
+      final url2 = Uri.parse(
+        'https://flutter-shop-app-9b43f-default-rtdb.europe-west1.firebasedatabase.app/userFavorites/$userId.json?auth=$token',
+      );
+      final favoriteResponse = await http.get(url2);
+      final favoriteData = json.decode(favoriteResponse.body);
       final List<Product> loadedProducts = [];
       extractedData.forEach((prodId, prodData) {
         loadedProducts.add(Product(
@@ -70,20 +79,21 @@ class Products with ChangeNotifier {
           price: prodData['price'],
           description: prodData['description'],
           imageUrl: prodData['imageUrl'],
-          isFavorite: prodData['isFavorite'],
+          isFavorite:
+              favoriteData == null ? false : favoriteData[prodId] ?? false,
         ));
       });
       _items = loadedProducts;
       notifyListeners();
     } catch (error) {
-      throw error;
+      print(error);
     }
   }
 
   Future<void> addProduct(Product product) async {
-    final url = Uri.https(
-        'flutter-shop-app-9b43f-default-rtdb.europe-west1.firebasedatabase.app',
-        '/products.json');
+    final url = Uri.parse(
+      'https://flutter-shop-app-9b43f-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$token',
+    );
 
     try {
       final response = await http.post(
@@ -93,7 +103,6 @@ class Products with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
-          'isFavorite': product.isFavorite,
         }),
       );
       final newProduct = Product(
@@ -115,9 +124,9 @@ class Products with ChangeNotifier {
   Future<void> updateProduct(String id, Product product) async {
     final prodIndex = _items.indexWhere((product) => product.id == id);
     if (prodIndex >= 0) {
-      final url = Uri.https(
-          'flutter-shop-app-9b43f-default-rtdb.europe-west1.firebasedatabase.app',
-          '/products/$id.json');
+      final url = Uri.parse(
+        'https://flutter-shop-app-9b43f-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=$token',
+      );
       await http.patch(url,
           body: json.encode(
             {
@@ -135,9 +144,9 @@ class Products with ChangeNotifier {
   }
 
   Future<void> deleteProduct(String id) async {
-    final url = Uri.https(
-        'flutter-shop-app-9b43f-default-rtdb.europe-west1.firebasedatabase.app',
-        '/products/$id.json');
+    final url = Uri.parse(
+      'https://flutter-shop-app-9b43f-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=$token',
+    );
     final existingProductIndex =
         _items.indexWhere((product) => product.id == id);
     var existingProduct = _items[existingProductIndex];
