@@ -104,10 +104,6 @@ class Auth with ChangeNotifier {
   }
 
   void logout() async {
-    final prefs = await SharedPreferences.getInstance();
-    if (prefs.containsKey('userData')) {
-      prefs.remove('userData');
-    }
     _token = null;
     _userId = null;
     _expiryDate = null;
@@ -116,6 +112,10 @@ class Auth with ChangeNotifier {
       _authTimer = null;
     }
     notifyListeners();
+    final prefs = await SharedPreferences.getInstance();
+    if (prefs.containsKey('userData')) {
+      prefs.remove('userData');
+    }
   }
 
   void _autoLogout() {
