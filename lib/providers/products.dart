@@ -56,9 +56,11 @@ class Products with ChangeNotifier {
     return _items.firstWhere((product) => product.id == id);
   }
 
-  Future<void> fetchAndSetProducts() async {
+  Future<void> fetchAndSetProducts([bool fliterByUser = false]) async {
+    final filterString =
+        fliterByUser ? 'orderBy="createrId"&equalTo="$userId"' : '';
     final url = Uri.parse(
-      'https://flutter-shop-app-9b43f-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$token',
+      'https://flutter-shop-app-9b43f-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$token&$filterString',
     );
     try {
       final response = await http.get(url);
@@ -103,6 +105,7 @@ class Products with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
+          'createrId': userId,
         }),
       );
       final newProduct = Product(
