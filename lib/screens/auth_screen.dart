@@ -156,10 +156,12 @@ class _AuthCardState extends State<AuthCard> {
         errorMessage = 'Invalid password';
       }
       _showErrorDialog(errorMessage);
-    } catch (error) {
-      var errorMessage = 'Could not authenticate you. Please try again later.';
-      _showErrorDialog(errorMessage);
-    }
+    } 
+    // catch (error) {
+    //   print(error.toString());
+    //   var errorMessage = 'Could not authenticate you. Please try again later.';
+    //   _showErrorDialog(errorMessage);
+    // }
     setState(() {
       _isLoading = false;
     });
