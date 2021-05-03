@@ -31,8 +31,8 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
   @override
   void initState() {
-    _imageFocusNode.addListener(_updateImageUrl);
     super.initState();
+    _imageFocusNode.addListener(_updateImageUrl);
   }
 
   @override

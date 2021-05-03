@@ -27,14 +27,13 @@ class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
 
   @override
   void initState() {
-      _isLoading = true;
+    super.initState();
+    _isLoading = true;
     Provider.of<Products>(context, listen: false)
         .fetchAndSetProducts()
         .then((_) => setState(() {
               _isLoading = false;
             }));
-
-    super.initState();
   }
 
   @override
